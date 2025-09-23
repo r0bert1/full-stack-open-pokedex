@@ -25,13 +25,12 @@ jobs:
       - name: build
         run: npm run build
       - name: notify discord of failed build
-        uses: rjstone/discord-webhook-notify@v2.2.1
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@0.4.0
         if: failure()
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          severity: error
-          title: Pokedex build failed
-          details: The build for commit `${{ github.sha }}` has failed
+          args: 'The build for commit `${{ github.sha }}` has failed'
       - name: test
         run: npm test
       - name: Install Playwright Browsers
@@ -48,13 +47,12 @@ jobs:
         if: ${{ github.event_name == 'push' && env.SKIP_DEPLOYMENT == 'false' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
       - name: notify discord of successful deployment
-        uses: rjstone/discord-webhook-notify@v2.2.1
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@0.4.0
         if: success()
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          severity: info
-          title: A new version of Pokedex deployed
-          details: to https://full-stack-open-pokedex-r0bert1.onrender.com/
+          args: 'A new version of Pokedex deployed to https://full-stack-open-pokedex-r0bert1.onrender.com/'
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
