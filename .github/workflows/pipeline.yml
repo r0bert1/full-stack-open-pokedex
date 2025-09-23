@@ -39,6 +39,14 @@ jobs:
       - name: deploy
         if: ${{ github.event_name == 'push' && env.SKIP_DEPLOYMENT == 'false' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+      - name: notify discord of successful deployment
+        uses: rjstone/discord-webhook-notify@v2.2.1
+        if: success()
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          title: A new version of Pokedex deployed
+          details: to https://full-stack-open-pokedex-r0bert1.onrender.com/
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
