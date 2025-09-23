@@ -24,6 +24,14 @@ jobs:
         run: npm run eslint
       - name: build
         run: npm run build
+      - name: notify discord of failed build
+        uses: rjstone/discord-webhook-notify@v2.2.1
+        if: failure()
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: error
+          title: Pokedex build failed
+          details: The build for commit `${{ github.sha }}` has failed
       - name: test
         run: npm test
       - name: Install Playwright Browsers
